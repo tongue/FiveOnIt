@@ -53,7 +53,7 @@ io.sockets.on('connection', function(socket){
 		
 		socket.emit('preloadGame', 
 		{
-			imageUrl: 'http://thinkprogress.org/wp-content/uploads/2013/01/Google-300x168.jpg'
+			imageUrl: '/images/pokemons.jpg'
 		})
 
 		
@@ -93,10 +93,10 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('clientClick', function(data)
 	{
-		var hit = detectHit(data.coordinates, clients[clients.indexOf(socket)].hitArea);
+		var hit = detectHit(data, clients[clients.indexOf(socket)].hitArea);
 		var win = false;
 		
-		if(hit)
+		if(hit)// 55 * 55
 		{
 			clients[clients.indexOf(socket)].points += 1;
 			win = (clients[clients.indexOf(socket)].points > 4);
@@ -108,7 +108,7 @@ io.sockets.on('connection', function(socket){
 			{
 				clients[clients.indexOf(socket)].points += 1;
 			}
-			var callbackObject = {x: 0, y: 0};
+			var callbackObject = {x: 0, y: 0, status: true};
 
 			socket.emit('clickCallback', callbackObject);
 		}
