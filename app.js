@@ -108,7 +108,7 @@ io.sockets.on('connection', function(socket){
 			{
 				clients[clients.indexOf(socket)].points += 1;
 			}
-			var callbackObject = {x = 0, y = 0};
+			var callbackObject = {x: 0, y: 0};
 
 			socket.emit('clickCallback', callbackObject);
 		}
