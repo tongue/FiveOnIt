@@ -1,6 +1,15 @@
 extends layout
 
 block content
-	canvas#image-map(width='1653', height='918')
+	canvas#image-map(width='1653', height='918').hidden
 
+	div.splash-screen
+		img(src="images/mag7logo.png")
 
+	div.connect.hidden
+		input(type="text", name="username", placeholder="Please enter your name")
+		button#connect Connect
+
+	div.ready-screen.hidden
+		button#ready READY
+		p.count-down.hidden 5

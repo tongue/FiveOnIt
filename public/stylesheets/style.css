@@ -1,9 +1,3 @@
-/*	Less Framework 4
-	http://lessframework.com
-	by Joni Korpi
-	License: http://opensource.org/licenses/mit-license.php	*/
-/*	Resets
-	------	*/
 html,
 body,
 div,
@@ -97,58 +91,55 @@ video {
 a img {
   border: 0;
 }
-/*	Typography presets
-	------------------	*/
-.gigantic {
-  font-size: 110px;
-  line-height: 120px;
-  letter-spacing: -2px;
-}
-.huge,
-h1 {
-  font-size: 68px;
-  line-height: 72px;
-  letter-spacing: -1px;
-}
-.large,
-h2 {
-  font-size: 42px;
-  line-height: 48px;
-}
-.bigger,
-h3 {
-  font-size: 26px;
-  line-height: 36px;
-}
-.big,
-h4 {
-  font-size: 22px;
-  line-height: 30px;
-}
 body {
-  font: 16px/24px Helvetica, sans-serif;
-}
-.small,
-small {
-  font-size: 13px;
-  line-height: 18px;
-}
-/* Selection colours (easy to forget) */
-::selection {
-  background: #ffff9e;
-}
-::-moz-selection {
-  background: #ffff9e;
-}
-img::selection {
-  background: transparent;
-}
-img::-moz-selection {
-  background: transparent;
-}
-body {
-  -webkit-tap-highlight-color: #ffff9e;
+  background-color: #000000;
+  font-family: Helvetica, sans-serif;
 }
 canvas {
   margin-left: 10px;
+}
+.splash-screen {
+  text-align: center;
+  margin-top: 40%;
+}
+.connect,
+.ready-screen {
+  width: 80%;
+  margin: 40% auto;
+  font-size: 2em;
+}
+.connect input,
+.ready-screen input,
+.connect button,
+.ready-screen button {
+  box-sizing: border-box;
+  width: 100%;
+}
+.connect input,
+.ready-screen input {
+  padding: 0.5em;
+  border: none;
+  border-radius: 0.3em;
+}
+.connect button,
+.ready-screen button {
+  margin-top: 1em;
+  background-color: #d60039;
+  color: #fff;
+  height: 2em;
+  border: none;
+  border-radius: 0.3em;
+}
+.connect button.ready,
+.ready-screen button.ready {
+  background-color: #40d156;
+}
+.connect .count-down,
+.ready-screen .count-down {
+  color: #fff;
+  font-size: 10em;
+  text-align: center;
+}
+.hidden {
+  display: none;
 }
