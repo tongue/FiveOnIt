@@ -1,7 +1,10 @@
 doctype 5
 html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    block content
+	head
+		title= title
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(data-main='/javascripts/main.js', src='/javascripts/vendor/require.js')
+
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		body
+			block content
