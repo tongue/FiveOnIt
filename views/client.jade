@@ -1,7 +1,11 @@
 extends layout
 
 block content
-	canvas#image-map(width='1653', height='918').hidden
+	div.canvas-screen
+		canvas#image-map(width='1653', height='918').hidden
+		div.next-object.hidden
+			h2 Find me!
+			img(src="/images/pok1.png")
 
 	div.splash-screen
 		img(src="images/mag7logo.png")
