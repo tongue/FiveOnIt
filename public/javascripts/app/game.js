@@ -9,7 +9,8 @@
  showReady
  startGame: noClients (antal klienter)
  clickCallback: status(true/false), x, y, nextObject
- GameOver: 
+ GameOver:
+ scoreChange: clients
  */
 
 define( [
@@ -39,6 +40,7 @@ define( [
 		this.$gameOver = $( '.game-over' );
 		this.socket = IO.connect( 'http://192.168.8.126:3000' );
 		this.$readyScreen = $( '.ready-screen' );
+		this.$hud = $( '.hud' );
 
 		this.bind();
 
@@ -55,6 +57,7 @@ define( [
 		this.socket.on( 'startGame', $.proxy( this.start, this ) );
 		this.socket.on( 'clickCallback', $.proxy( this.onClickResult, this ) );
 		this.socket.on( 'gameOver', $.proxy( this.gameOver, this ) );
+		this.socket.on( 'scoreChange', $.proxy( this.updateScore, this ) );
 	};
 
 	Game.prototype.prepareNextObject = function ( nextObject ) {
@@ -73,6 +76,7 @@ define( [
 		event.preventDefault();
 		this.username = $( '[name="username"]' ).val();
 		if ( this.username.length > 0 ) {
+			this.$hud.find( '.client-name' ).text( this.username );
 			var data = {
 				username: this.username
 			};
@@ -150,6 +154,17 @@ define( [
 
 		this.$gameOver.find( '.highscore' ).html( html );
 		this.switchView( this.$canvasScreen, this.$gameOver );
+	};
+
+	Game.prototype.updateScore = function ( clients ) {
+		// client-name, client-points, client-diff
+		var first = clients[0];
+		this.$hud.find( '.client-name' ).text( first.nick );
+		this.$hud.find( '.client-points' ).text( first.points + 'p');
+
+		var me = _.findWhere( clients, { nick: this.username });
+		var diff = first.points - me.points;
+		this.$hud.find( '.client-diff' ).text('(' + diff + ')');
 	};
 
 	Game.prototype.switchView = function ( from, to, callback ) {
