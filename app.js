@@ -64,6 +64,7 @@ io.sockets.on('connection', function(socket){
 		clients[clients.indexOf(socket)].username = data.username;
 
 		clients[clients.indexOf(socket)].points = 0;
+		clients[clients.indexOf(socket)].totalClicks = 0;
 
 		clients[clients.indexOf(socket)].totalTime = 0;
 
@@ -122,11 +123,14 @@ io.sockets.on('connection', function(socket){
 		var currClient = clients[clients.indexOf(socket)];
 		var point = clients[clients.indexOf(socket)].points;
 
+		currClient.totalClicks += 1;
 		currClient.GameRound[currClient.points].noClicks += 1;
 
 		var objA = Rect(data.x, data.y, 1, 1);
 		var objB = currClient.GameRound[currClient.points].HitArea;
 
+		console.log('HitTest IN:', data, objA);
+		console.log('HitTest Compare: ', objB);
 		var hit = detectHit(objA, objB);
 		var win = false;
 		
@@ -181,7 +185,7 @@ io.sockets.on('connection', function(socket){
 	function reportPointChanges()
 	{
 		console.log('Reporting Change in scoreboard');
-		
+
 		io.sockets.emit('scoreChange', getScoarboard());
 	}
 
@@ -211,7 +215,7 @@ function getScoarboard()
 	var scoreboard = [];
 	clients.forEach(function(client)
 	{
-		scoreboard.push({nick: client.username, points: client.points, totalTime: client.totalTime});
+		scoreboard.push({nick: client.username, points: client.points, totalTime: client.totalTime, totalClicks: client.totalClicks});
 	});
 	
 	var sortedBoard = scoreboard.sort(function(a,b) 
