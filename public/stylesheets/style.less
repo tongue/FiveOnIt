@@ -24,7 +24,7 @@ body {
 }
 
 canvas {
-	margin-left: 10px;
+	margin-top: 1em;
 }
 
 .splash-screen {
@@ -32,7 +32,7 @@ canvas {
 	margin-top: 40%;
 }
 
-.connect, .ready-screen, .next-object {
+.connect, .ready-screen, .next-object, .game-over {
 	width: 80%;
 	margin: 40% auto;
 	font-size: 2em;
@@ -65,7 +65,9 @@ canvas {
 		color: #fff;
 		font-size: 10em;
 		text-align: center;
-		margin-top: 0;
+		margin-top: -20%;
+		padding-top: 0;
+		line-height: 1;
 	}
 }
 
@@ -75,4 +77,47 @@ canvas {
 
 .hidden {
 	display: none;
+}
+
+.game-over {
+	text-align: center;
+}
+
+.highscore {
+	width: 50%;
+	margin: 1em auto;
+	td {
+		text-align: left;
+	}
+	td + td {
+		text-align: right;
+	}
+}
+
+.hud {
+	position: fixed;
+	width: 100%;
+	top: 0;
+	left: 0;
+	background-color: #d60039;
+	color: #fff;
+	font-size: 0.8em;
+	line-height: 2em;
+
+	.client-name {
+		margin-left: 1em;
+	}
+	.client-score {
+		margin-left: .5em;
+		font-weight: bold;
+	}
+	.client-diff {
+		font-size: .9em;
+		font-weight: normal;
+	}
+
+	.weapon {
+		float: right;
+		margin-right: 1em;
+	}
 }

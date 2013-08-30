@@ -1,15 +1,25 @@
 extends layout
 
 block content
-	div.canvas-screen
-		button#btnWeapon Fire!
+
+	div.splash-screen
+		img(src="images/mag7logo.png")
+
+	div.canvas-screen.hidden
+		div.hud
+			span.first-pos
+				span.client-name Johan
+				span.client-score
+					span.client-points
+					span.client-diff
+
+			button#btnWeapon.weapon Fire 1!
+			button#btnWeapon2.weapon Fire 2!
+
 		canvas#image-map(width='1653', height='950').hidden
 		div.next-object.hidden
 			h2 Find me!
 			img(src="/images/pok1.png")
-
-	div.splash-screen
-		img(src="images/mag7logo.png")
 
 	div.connect.hidden
 		input(type="text", name="username", placeholder="Please enter your name")

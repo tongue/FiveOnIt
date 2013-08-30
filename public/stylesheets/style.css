@@ -97,7 +97,7 @@ body {
   font-family: Helvetica, sans-serif;
 }
 canvas {
-  margin-left: 10px;
+  margin-top: 1em;
 }
 .splash-screen {
   text-align: center;
@@ -105,7 +105,8 @@ canvas {
 }
 .connect,
 .ready-screen,
-.next-object {
+.next-object,
+.game-over {
   width: 80%;
   margin: 40% auto;
   font-size: 2em;
@@ -113,22 +114,26 @@ canvas {
 .connect input,
 .ready-screen input,
 .next-object input,
+.game-over input,
 .connect button,
 .ready-screen button,
-.next-object button {
+.next-object button,
+.game-over button {
   box-sizing: border-box;
   width: 100%;
 }
 .connect input,
 .ready-screen input,
-.next-object input {
+.next-object input,
+.game-over input {
   padding: 0.5em;
   border: none;
   border-radius: 0.3em;
 }
 .connect button,
 .ready-screen button,
-.next-object button {
+.next-object button,
+.game-over button {
   margin-top: 1em;
   background-color: #d60039;
   color: #fff;
@@ -138,20 +143,62 @@ canvas {
 }
 .connect button.ready,
 .ready-screen button.ready,
-.next-object button.ready {
+.next-object button.ready,
+.game-over button.ready {
   background-color: #40d156;
 }
 .connect .count-down,
 .ready-screen .count-down,
-.next-object .count-down {
+.next-object .count-down,
+.game-over .count-down {
   color: #fff;
   font-size: 10em;
   text-align: center;
-  margin-top: 0;
+  margin-top: -20%;
+  padding-top: 0;
+  line-height: 1;
 }
 .next-object {
   text-align: center;
 }
 .hidden {
   display: none;
+}
+.game-over {
+  text-align: center;
+}
+.highscore {
+  width: 50%;
+  margin: 1em auto;
+}
+.highscore td {
+  text-align: left;
+}
+.highscore td + td {
+  text-align: right;
+}
+.hud {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: #d60039;
+  color: #fff;
+  font-size: 0.8em;
+  line-height: 2em;
+}
+.hud .client-name {
+  margin-left: 1em;
+}
+.hud .client-score {
+  margin-left: .5em;
+  font-weight: bold;
+}
+.hud .client-diff {
+  font-size: .9em;
+  font-weight: normal;
+}
+.hud .weapon {
+  float: right;
+  margin-right: 1em;
 }

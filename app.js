@@ -121,6 +121,9 @@ io.sockets.on('connection', function(socket){
 	socket.on('clientClick', function(data)
 	{
 		var currClient = clients[clients.indexOf(socket)];
+		console.log('client Click: ', currClient);
+		if(!currClient) return;
+
 		var point = currClient.points;
 
 		currClient.totalClicks += 1;
@@ -136,7 +139,6 @@ io.sockets.on('connection', function(socket){
 		
 		if(hit)// 55 * 55
 		{
-			reportPointChanges();
 			var roundTime = totalTimeSinceStart(currClient.GameRound[point].startTime);
 			currClient.totalTime += roundTime
 			currClient.GameRound[point].roundTime = roundTime;
@@ -157,8 +159,10 @@ io.sockets.on('connection', function(socket){
 			callbackObject.x = hitCoordinates[currClient.points-1].HitArea.x;
 			callbackObject.y = hitCoordinates[currClient.points-1].HitArea.y;
 		}
+
 		socket.emit('clickCallback', callbackObject);
-		
+		reportPointChanges();
+
 		if(win)
 		{
 			endGame();
@@ -184,6 +188,7 @@ io.sockets.on('connection', function(socket){
 
 
 	socket.on('disconnect', function(){
+		console.log('CLIENT DISCONNECTED');
 		clients.splice(clients.indexOf(socket), 1);
 	});
 
@@ -198,6 +203,7 @@ io.sockets.on('connection', function(socket){
 
 
 function disconnectAll() {
+	console.log("DISCONNECT ALL")
 	var rooms = io.sockets.manager.rooms;
 	var users;
 	for(var i = 0;i<rooms.length; i++){
