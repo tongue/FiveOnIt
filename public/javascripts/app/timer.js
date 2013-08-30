@@ -1,4 +1,4 @@
-define( ['jquery'], function ($) {
+define( function () {
 	var count = 5,
 			element,
 			counter;
@@ -17,6 +17,9 @@ define( ['jquery'], function ($) {
 		start: function ( $element ) {
 			element = $element;
 			counter = setInterval( timer, 1000 );
+		},
+		setCount: function ( countVal ) {
+			count = countVal;
 		}
 	};
 } );

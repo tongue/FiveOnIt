@@ -17,8 +17,9 @@ define( [
 	'app/imageHandler',
 	'socketio',
 	'app/timer',
+	'app/draw',
 	'mobileevents'
-], function ( $, ImageHandler, IO, timer ) {
+], function ( $, ImageHandler, IO, timer, draw ) {
 	var Game = function () {
 		this.options = {
 			hiddenClass: 'hidden',
@@ -54,18 +55,25 @@ define( [
 		this.socket.on( 'GameOver', $.proxy( this.gameOver, this ) );
 	};
 
+	Game.prototype.create = function ( gameData ) {
+		var that = this;
+		this.prepareNextObject( gameData.nextObject );
+		this.image = ImageHandler.addImage( gameData.imageUrl, function ( image ) {
+			that.context.drawImage( image, 0, 0 );
+			that.$btnReady.removeClass( that.options.hiddenClass );
+		} );
+	};
+
+	Game.prototype.prepareNextObject = function ( nextObject ) {
+		this.$canvasScreen.find( '.next-object' ).find( 'img' ).prop( 'src', nextObject );
+	};
+
+	// Steps
 	Game.prototype.showConnectScreen = function () {
 		this.$splash = $( '.splash-screen' );
 		this.$connect = $( '.connect' );
 
 		this.switchView( this.$splash, this.$connect );
-	};
-
-	Game.prototype.onReady = function ( event ) {
-		event.preventDefault();
-		this.$btnReady.addClass( 'ready' ).off( 'click' );
-//		this.socket.emit( 'clientReady', { ready: true } );
-		this.start( {} );
 	};
 
 	Game.prototype.onConnectClick = function ( event ) {
@@ -75,10 +83,21 @@ define( [
 			var data = {
 				username: this.username
 			};
-//			this.socket.emit( 'joinGame', data );
+			this.socket.emit( 'joinGame', data );
 			this.$btnConnect.addClass( 'hidden' );
 			this.showReadyScreen();
 		}
+	};
+
+	Game.prototype.showReadyScreen = function () {
+		this.$readyScreen = $( '.ready-screen' );
+		this.switchView( this.$connect, this.$readyScreen );
+	};
+
+	Game.prototype.onReady = function ( event ) {
+		event.preventDefault();
+		this.$btnReady.addClass( 'ready' ).off( 'click' );
+		this.socket.emit( 'clientReady', { ready: true } );
 	};
 
 	Game.prototype.start = function () {
@@ -90,42 +109,39 @@ define( [
 		$countDown.removeClass( this.options.hiddenClass );
 		$countDown.on( 'countdown.complete', function () {
 			that.switchView( that.$readyScreen, that.$canvasScreen, $.proxy( that.showNextObject, that ) );
+			timer.setCount( 5 );
 		} );
 		timer.start( $countDown );
 	};
 
-	Game.prototype.showReadyScreen = function () {
-		this.$readyScreen = $( '.ready-screen' );
-		this.switchView( this.$connect, this.$readyScreen );
-	};
-
 	Game.prototype.showNextObject = function () {
-		this.$canvas.addClass( this.options.hiddenClass );
-		this.$canvasScreen.find( '.next-object' ).removeClass( this.options.hiddenClass );
+		var that = this;
+		this.switchView( this.$canvas, this.$canvasScreen.find( '.next-object' ), function () {
+			setTimeout( $.proxy( that.showCanvas, that ), 5000 );
+		} );
 	};
 
-	Game.prototype.onClickResult = function ( data ) {
-
-	};
-
-	Game.prototype.gameOver = function ( data ) {
-
+	Game.prototype.showCanvas = function () {
+		this.switchView( this.$canvasScreen.find( '.next-object' ), this.$canvas );
 	};
 
 	Game.prototype.onDoubleTap = function ( event ) {
 		this.socket.emit( 'clientClick', ImageHandler.getCoordinates( this.$canvas, event.clientX, event.clientY ) );
 	};
 
-	Game.prototype.create = function ( gameData ) {
-		var that = this;
-		this.image = ImageHandler.addImage( gameData.imageUrl, function ( image ) {
-			that.context.drawImage( image, 0, 0 );
-			// trigger image loaded
-		} );
+	Game.prototype.onClickResult = function ( data ) {
+		if ( data.status ) {
+			var that = this;
+			draw.drawHit( this.context, data.x, data.y );
+			this.prepareNextObject( data.nextObject );
+			setTimeout( function() {
+				that.showNextObject();
+			}, 1000);
+		}
 	};
 
-	Game.prototype.prepareNextObject = function(nextObject) {
-		// TODO: build the next object
+	Game.prototype.gameOver = function ( data ) {
+
 	};
 
 	Game.prototype.switchView = function ( from, to, callback ) {

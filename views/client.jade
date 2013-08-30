@@ -2,7 +2,7 @@ extends layout
 
 block content
 	div.canvas-screen
-		canvas#image-map(width='1653', height='918').hidden
+		canvas#image-map(width='1653', height='950').hidden
 		div.next-object.hidden
 			h2 Find me!
 			img(src="/images/pok1.png")
@@ -15,5 +15,5 @@ block content
 		button#connect Connect
 
 	div.ready-screen.hidden
-		button#ready READY
+		button#ready.hidden READY
 		p.count-down.hidden 5
