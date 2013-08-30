@@ -44,6 +44,7 @@ var io = require('socket.io').listen(server);
 var clients = [];
 var b = 55;
 var h = 55;
+var GAME_ON = false;
 var GAME_RUNTIME_SECONDS = 60*5;
 var hitCoordinates = 
 [
@@ -80,7 +81,10 @@ io.sockets.on('connection', function(socket){
 		console.log(noClients);
 		if(noClients > 1)
 		{
-			io.sockets.emit('showReady', true);
+			if(!GAME_ON)
+				io.sockets.emit('showReady', true);
+			else
+				socket.emit('error', { msg: 'Unable to connect to active game'});
 		}		
 
 	})
@@ -98,6 +102,7 @@ io.sockets.on('connection', function(socket){
 
 		if(allIsReady)
 		{
+			GAME_ON = true;
 			io.sockets.emit('startGame', { noClients: clients.length} );
 			startTime = new Date();
 			startTime.setSeconds(startTime.getSeconds() + 5);
@@ -107,7 +112,7 @@ io.sockets.on('connection', function(socket){
 				client.GameRound[0].startTime = startTime;
 			});
 
-			timer(GAME_RUNTIME_SECONDS, endGame());
+			//timer(GAME_RUNTIME_SECONDS, endGame);
 		}
 
 	})
@@ -135,26 +140,36 @@ io.sockets.on('connection', function(socket){
 			win = (clients[clients.indexOf(socket)].points >= hitCoordinates.length);
 		}
 
-		if(!win)
+
+		var callbackObject = {x: data.x, y: data.y, status: hit};
+		if(hit)
 		{
-			var callbackObject = {x: data.x, y: data.y, status: hit};
-			if(hit)
-			{
-				currClient.GameRound.push({HitArea: hitCoordinates[clients[clients.indexOf(socket)].points].HitArea});
+			currClient.GameRound.push({HitArea: hitCoordinates[clients[clients.indexOf(socket)].points].HitArea});
 
-				callbackObject.nextObject = hitCoordinates[clients[clients.indexOf(socket)].points].viewImage;
+			callbackObject.nextObject = hitCoordinates[clients[clients.indexOf(socket)].points].viewImage;
 
-				callbackObject.x = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.x;
-				callbackObject.y = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.y;
-			}
-			socket.emit('clickCallback', callbackObject);
+			callbackObject.x = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.x;
+			callbackObject.y = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.y;
 		}
-		else
+		socket.emit('clickCallback', callbackObject);
+		
+		if(win)
 		{
-
 			endGame();
 		}
 	})
+
+	
+	function endGame(){
+		console.log('EndGame -> GAME_ON:', GAME_ON);
+		if(GAME_ON)
+		{
+			GAME_ON = false;
+			io.sockets.emit('gameOver', getScoarboard());
+			disconnectAll();
+		}
+	}
+
 
 
 	socket.on('disconnect', function(){
@@ -163,20 +178,13 @@ io.sockets.on('connection', function(socket){
 
 });
 
-function detectHit(a, b) {
-  return !(
-        ((a.y + a.h) < (b.y)) ||
-        (a.y > (b.y + b.h)) ||
-        ((a.x + a.w) < b.x) ||
-        (a.x > (b.x + b.w))
-    );
-}
-function Rect(x,y,w,h){ return {
-x : x,
-y : y,
-w : w,
-h : h}
-}
+	function reportPointChanges()
+	{
+		console.log('Reporting Change in scoreboard');
+		
+		io.sockets.emit('scoreChange', getScoarboard());
+	}
+
 
 function disconnectAll() {
 	var rooms = io.sockets.manager.rooms;
@@ -189,6 +197,7 @@ function disconnectAll() {
 	}
     return this;
 };
+
 function timer(timeInSeconds, endCallback){
 	var interval = setInterval(function(){
 		clearInterval(interval);
@@ -197,11 +206,11 @@ function timer(timeInSeconds, endCallback){
 
 }
 
-function endGame(){
+function getScoarboard()
+{
 	var scoreboard = [];
 	clients.forEach(function(client)
 	{
-		console.log('endgame-->: ', client.username, client.points, client.totalTime);
 		scoreboard.push({nick: client.username, points: client.points, totalTime: client.totalTime});
 	});
 	
@@ -219,12 +228,23 @@ function endGame(){
 			return 0;
 		} );
 
-	io.sockets.emit('gameOver', sortedBoard);
-	disconnectAll();
+	return scoreboard;
 }
 
-
-
+function detectHit(a, b) {
+  return !(
+        ((a.y + a.h) < (b.y)) ||
+        (a.y > (b.y + b.h)) ||
+        ((a.x + a.w) < b.x) ||
+        (a.x > (b.x + b.w))
+    );
+}
+function Rect(x,y,w,h){ return {
+x : x,
+y : y,
+w : w,
+h : h}
+}
 
 
 // ropa på den här när vi vill få
