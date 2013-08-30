@@ -136,7 +136,6 @@ io.sockets.on('connection', function(socket){
 		
 		if(hit)// 55 * 55
 		{
-			reportPointChanges();
 			var roundTime = totalTimeSinceStart(currClient.GameRound[point].startTime);
 			currClient.totalTime += roundTime
 			currClient.GameRound[point].roundTime = roundTime;
@@ -157,7 +156,9 @@ io.sockets.on('connection', function(socket){
 			callbackObject.x = hitCoordinates[currClient.points-1].HitArea.x;
 			callbackObject.y = hitCoordinates[currClient.points-1].HitArea.y;
 		}
+
 		socket.emit('clickCallback', callbackObject);
+		reportPointChanges();
 		
 		if(win)
 		{
