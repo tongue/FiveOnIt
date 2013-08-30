@@ -20,8 +20,9 @@ define( [
 	'app/timer',
 	'app/draw',
 	'socketio',
+	'buzz',
 	'mobileevents'
-], function ( $, ImageHandler, imageEffects, timer, draw, IO ) {
+], function ( $, ImageHandler, imageEffects, timer, draw, IO, Buzz ) {
 	var Game = function () {
 		this.options = {
 			hiddenClass: 'hidden',
@@ -37,10 +38,13 @@ define( [
 		this.$canvasScreen = $( '.canvas-screen' );
 		this.context = this.canvas.getContext( '2d' );
 		this.image = null;
+		this.weaponLaunched = false;
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
 		this.$gameOver = $( '.game-over' );
-		this.socket = IO.connect( 'http://192.168.8.142:3000' );
+
+		this.socket = IO.connect( 'http://192.168.8.44:3000' );
+
 		this.$btnWeapon = $( '#btnWeapon' );
 		this.$btnWeapon2 = $( '#btnWeapon2');
 		this.$readyScreen = $( '.ready-screen' );
@@ -98,6 +102,9 @@ define( [
 	Game.prototype.create = function ( gameData ) {
 		var that = this;
 		this.prepareNextObject( gameData.nextObject );
+
+		this.screamSound = new Buzz.sound( "/sounds/scream", {formats: [ "mp3" ]});
+
 		this.image = ImageHandler.addImage( gameData.imageUrl, function ( image ) {
 			that.context.drawImage( image, 0, 0 );
 			that.image = image;
@@ -184,7 +191,12 @@ define( [
 	};
 
 	Game.prototype.onGreyscaleWeaponUse = function() {
-		console.log('client sent greyscale weapon event');
+
+		console.log('client sent weapon event');
+		if(this.weaponLaunched)
+			return;
+		this.weaponLaunched = true;
+
 		this.socket.emit('greyScaleWeaponReceive');
 	};
 
@@ -204,7 +216,13 @@ define( [
 	Game.prototype.onGreyScaleWeaponReceive = function() {
 		console.log('client received weapon event');
 		var that = this;
-		imageEffects.greyscale(that.image,that.context);
+		var origImageData = imageEffects.greyscale(that.image, that.context)
+		setTimeout(
+			function(){
+				that.context.putImageData(origImageData, 0, 0);
+			}
+		,3000);
+
 	};
 
 	Game.prototype.switchView = function ( from, to, callback ) {
