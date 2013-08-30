@@ -17,5 +17,5 @@ define( ['jquery'], function ( $ ) {
 			imageData.data.set(dataCopy);
 			return imageData;
 		}
-	}
+	};
 } );
