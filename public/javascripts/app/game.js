@@ -158,7 +158,8 @@ define( [
 	};
 
 	Game.prototype.onGreyscaleWeaponUse = function() {
-		this.socket.broadcast.emit('greyScaleWeaponReceive');
+		console.log('client sent weapon event');
+		this.socket.emit('greyScaleWeaponReceive');
 	};
 
 	Game.prototype.onGreyScaleWeaponReceive = function() {
