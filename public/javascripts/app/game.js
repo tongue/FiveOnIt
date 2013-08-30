@@ -41,7 +41,7 @@ define( [
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
 		this.$gameOver = $( '.game-over' );
-		this.socket = IO.connect( 'http://192.168.8.142:3000' );
+		this.socket = IO.connect( 'http://192.168.8.126:3000' );
 		this.$btnWeapon = $( '#btnWeapon' );
 		this.$readyScreen = $( '.ready-screen' );
 		this.$hud = $( '.hud' );

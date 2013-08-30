@@ -1,4 +1,4 @@
-define( [''], function ( $ ) {
+define( ['jquery'], function ( $ ) {
 	return {
 		greyscale: function(imageObj, ctx){
 			var x = y = 0;
