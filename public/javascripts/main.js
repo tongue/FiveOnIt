@@ -3,6 +3,7 @@ require.config( {
 		'jquery': 'vendor/jquery',
 		'underscore': 'vendor/underscore',
 		'mobileevents': 'plugins/jquery.mobile-events',
+		'socketio': './../socket.io/socket.io.js'
 	},
 
 	shim: {

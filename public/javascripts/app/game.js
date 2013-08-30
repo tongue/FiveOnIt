@@ -17,8 +17,9 @@ define( [
 	'app/imageHandler',
 	'app/timer',
 	'app/draw',
+	'socketio',
 	'mobileevents'
-], function ( $, ImageHandler, timer, draw ) {
+], function ( $, ImageHandler, timer, draw, IO ) {
 	var Game = function () {
 		this.options = {
 			hiddenClass: 'hidden',
@@ -35,7 +36,7 @@ define( [
 		this.context = this.canvas.getContext( '2d' );
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
-		this.socket = window.IO.connect( 'http://192.168.8.126:3000' );
+		this.socket = IO.connect( 'http://192.168.8.126:3000' );
 		this.$readyScreen = $( '.ready-screen' );
 
 		this.bind();
