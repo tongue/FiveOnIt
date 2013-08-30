@@ -41,7 +41,7 @@ define( [
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
 		this.$gameOver = $( '.game-over' );
-		this.socket = IO.connect( 'http://192.168.8.126:3000' );
+		this.socket = IO.connect( 'http://192.168.8.44:3000' );
 		this.$btnWeapon = $( '#btnWeapon' );
 		this.$readyScreen = $( '.ready-screen' );
 		this.$hud = $( '.hud' );
@@ -181,8 +181,8 @@ define( [
 
 	Game.prototype.onGreyscaleWeaponUse = function() {
 		console.log('client sent weapon event');
-		if(that.weaponLaunched)
-			return;
+		//if(that.weaponLaunched)
+		//	return;
 		that.weaponLaunched = true;
 		this.socket.emit('greyScaleWeaponReceive');
 	};
