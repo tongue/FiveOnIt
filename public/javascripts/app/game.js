@@ -15,11 +15,10 @@
 define( [
 	'jquery',
 	'app/imageHandler',
-	'socketio',
 	'app/timer',
 	'app/draw',
 	'mobileevents'
-], function ( $, ImageHandler, IO, timer, draw ) {
+], function ( $, ImageHandler, timer, draw ) {
 	var Game = function () {
 		this.options = {
 			hiddenClass: 'hidden',
@@ -36,7 +35,8 @@ define( [
 		this.context = this.canvas.getContext( '2d' );
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
-		this.socket = IO.connect( 'http://localhost:3000' );
+		this.socket = window.IO.connect( 'http://192.168.8.126:3000' );
+		this.$readyScreen = $( '.ready-screen' );
 
 		this.bind();
 
@@ -49,19 +49,10 @@ define( [
 		this.$btnReady.on( 'click', $.proxy( this.onReady, this ) );
 
 		this.socket.on( 'preloadGame', $.proxy( this.create, this ) );
-		this.socket.on( 'showReady', $.proxy( this.showReadyScreen, this ) );
+		this.socket.on( 'showReady', $.proxy( this.showReady, this ) );
 		this.socket.on( 'startGame', $.proxy( this.start, this ) );
 		this.socket.on( 'clickCallback', $.proxy( this.onClickResult, this ) );
 		this.socket.on( 'GameOver', $.proxy( this.gameOver, this ) );
-	};
-
-	Game.prototype.create = function ( gameData ) {
-		var that = this;
-		this.prepareNextObject( gameData.nextObject );
-		this.image = ImageHandler.addImage( gameData.imageUrl, function ( image ) {
-			that.context.drawImage( image, 0, 0 );
-			that.$btnReady.removeClass( that.options.hiddenClass );
-		} );
 	};
 
 	Game.prototype.prepareNextObject = function ( nextObject ) {
@@ -85,13 +76,21 @@ define( [
 			};
 			this.socket.emit( 'joinGame', data );
 			this.$btnConnect.addClass( 'hidden' );
-			this.showReadyScreen();
+			this.switchView( this.$connect, this.$readyScreen );
 		}
 	};
 
-	Game.prototype.showReadyScreen = function () {
-		this.$readyScreen = $( '.ready-screen' );
-		this.switchView( this.$connect, this.$readyScreen );
+	Game.prototype.create = function ( gameData ) {
+		var that = this;
+		this.prepareNextObject( gameData.nextObject );
+		this.image = ImageHandler.addImage( gameData.imageUrl, function ( image ) {
+			that.context.drawImage( image, 0, 0 );
+		} );
+	};
+
+	Game.prototype.showReady = function ( ) {
+		this.$readyScreen.find('.waiting' ).addClass( this.options.hiddenClass );
+		this.$btnReady.removeClass( this.options.hiddenClass );
 	};
 
 	Game.prototype.onReady = function ( event ) {
