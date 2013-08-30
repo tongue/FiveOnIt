@@ -148,10 +148,11 @@ io.sockets.on('connection', function(socket){
 		var callbackObject = {x: data.x, y: data.y, status: hit};
 		if(hit)
 		{
-			currClient.GameRound.push({HitArea: hitCoordinates[clients[clients.indexOf(socket)].points].HitArea});
-
-			callbackObject.nextObject = hitCoordinates[clients[clients.indexOf(socket)].points].viewImage;
-
+			if(!win)
+			{
+				currClient.GameRound.push({HitArea: hitCoordinates[clients[clients.indexOf(socket)].points].HitArea});
+				callbackObject.nextObject = hitCoordinates[clients[clients.indexOf(socket)].points].viewImage;
+			}
 			callbackObject.x = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.x;
 			callbackObject.y = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.y;
 		}
