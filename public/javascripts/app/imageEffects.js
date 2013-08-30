@@ -3,6 +3,7 @@ define( [''], function ( $ ) {
 		greyscale: function(imageObj, ctx){
 			var x = y = 0;
 			var imageData = ctx.getImageData(x, y, imageObj.width, imageObj.height);
+			var dataCopy = new Uint8ClampedArray(imageData.data);
 			var data = imageData.data;
 
 			for(var i = 0; i < data.length; i += 4) {
@@ -11,9 +12,10 @@ define( [''], function ( $ ) {
 			  data[i + 1] = brightness;
 			  data[i + 2] = brightness;
 			}
-
-			// overwrite original image
+			
 			ctx.putImageData(imageData, x, y);
+			imageData.data.set(dataCopy);
+			return imageData;
 		}
 	}
 } );
