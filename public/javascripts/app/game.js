@@ -20,8 +20,9 @@ define( [
 	'app/timer',
 	'app/draw',
 	'socketio',
+	'buzz',
 	'mobileevents'
-], function ( $, ImageHandler, imageEffects, timer, draw, IO ) {
+], function ( $, ImageHandler, imageEffects, timer, draw, IO, Buzz ) {
 	var Game = function () {
 		this.options = {
 			hiddenClass: 'hidden',
@@ -98,6 +99,9 @@ define( [
 	Game.prototype.create = function ( gameData ) {
 		var that = this;
 		this.prepareNextObject( gameData.nextObject );
+
+		this.screamSound = new Buzz.sound( "/sounds/scream", {formats: [ "mp3" ]});
+
 		this.image = ImageHandler.addImage( gameData.imageUrl, function ( image ) {
 			that.context.drawImage( image, 0, 0 );
 			that.image = image;
