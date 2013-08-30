@@ -97,7 +97,7 @@ body {
   font-family: Helvetica, sans-serif;
 }
 canvas {
-  margin-left: 10px;
+  margin-top: 1em;
 }
 .splash-screen {
   text-align: center;
@@ -155,6 +155,8 @@ canvas {
   font-size: 10em;
   text-align: center;
   margin-top: 0;
+  padding-top: 0;
+  line-height: 1;
 }
 .next-object {
   text-align: center;
@@ -191,4 +193,7 @@ canvas {
 .hud .client-score {
   margin-left: .5em;
   font-weight: bold;
+}
+.hud .weapon {
+  float: right;
 }
