@@ -121,7 +121,7 @@ io.sockets.on('connection', function(socket){
 	socket.on('clientClick', function(data)
 	{
 		var currClient = clients[clients.indexOf(socket)];
-		var point = clients[clients.indexOf(socket)].points;
+		var point = currClient.points;
 
 		currClient.totalClicks += 1;
 		currClient.GameRound[currClient.points].noClicks += 1;
@@ -136,12 +136,13 @@ io.sockets.on('connection', function(socket){
 		
 		if(hit)// 55 * 55
 		{
+			reportPointChanges();
 			var roundTime = totalTimeSinceStart(currClient.GameRound[point].startTime);
 			currClient.totalTime += roundTime
 			currClient.GameRound[point].roundTime = roundTime;
 			
-			clients[clients.indexOf(socket)].points += 1;
-			win = (clients[clients.indexOf(socket)].points >= hitCoordinates.length);
+			currClient.points += 1;
+			win = (currClient.points >= hitCoordinates.length);
 		}
 
 
@@ -150,11 +151,11 @@ io.sockets.on('connection', function(socket){
 		{
 			if(!win)
 			{
-				currClient.GameRound.push({HitArea: hitCoordinates[clients[clients.indexOf(socket)].points].HitArea});
-				callbackObject.nextObject = hitCoordinates[clients[clients.indexOf(socket)].points].viewImage;
+				currClient.GameRound.push({HitArea: hitCoordinates[currClient.points].HitArea});
+				callbackObject.nextObject = hitCoordinates[currClient.points].viewImage;
 			}
-			callbackObject.x = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.x;
-			callbackObject.y = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.y;
+			callbackObject.x = hitCoordinates[currClient.points-1].HitArea.x;
+			callbackObject.y = hitCoordinates[currClient.points-1].HitArea.y;
 		}
 		socket.emit('clickCallback', callbackObject);
 		
@@ -221,7 +222,13 @@ function getScoarboard()
 	var scoreboard = [];
 	clients.forEach(function(client)
 	{
-		scoreboard.push({nick: client.username, points: client.points, totalTime: client.totalTime, totalClicks: client.totalClicks});
+		scoreboard.push(
+				{
+					nick: client.username, 
+					points: client.points, 
+					totalTime: client.totalTime, 
+					totalClicks: client.totalClicks
+				});
 	});
 	
 	var sortedBoard = scoreboard.sort(function(a,b) 
