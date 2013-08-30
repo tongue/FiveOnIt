@@ -175,6 +175,10 @@ io.sockets.on('connection', function(socket){
 		}
 	}
 
+	socket.on('greyScaleWeaponReceive'){
+		io.sockets.broadcast.emit('greyScaleWeaponReceive');
+	}
+
 
 
 	socket.on('disconnect', function(){
