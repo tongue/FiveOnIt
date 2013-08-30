@@ -93,6 +93,7 @@ a img {
 }
 body {
   background-color: #000000;
+  color: #ffffff;
   font-family: Helvetica, sans-serif;
 }
 canvas {
@@ -103,26 +104,31 @@ canvas {
   margin-top: 40%;
 }
 .connect,
-.ready-screen {
+.ready-screen,
+.next-object {
   width: 80%;
   margin: 40% auto;
   font-size: 2em;
 }
 .connect input,
 .ready-screen input,
+.next-object input,
 .connect button,
-.ready-screen button {
+.ready-screen button,
+.next-object button {
   box-sizing: border-box;
   width: 100%;
 }
 .connect input,
-.ready-screen input {
+.ready-screen input,
+.next-object input {
   padding: 0.5em;
   border: none;
   border-radius: 0.3em;
 }
 .connect button,
-.ready-screen button {
+.ready-screen button,
+.next-object button {
   margin-top: 1em;
   background-color: #d60039;
   color: #fff;
@@ -131,13 +137,19 @@ canvas {
   border-radius: 0.3em;
 }
 .connect button.ready,
-.ready-screen button.ready {
+.ready-screen button.ready,
+.next-object button.ready {
   background-color: #40d156;
 }
 .connect .count-down,
-.ready-screen .count-down {
+.ready-screen .count-down,
+.next-object .count-down {
   color: #fff;
   font-size: 10em;
+  text-align: center;
+  margin-top: 0;
+}
+.next-object {
   text-align: center;
 }
 .hidden {

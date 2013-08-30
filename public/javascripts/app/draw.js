@@ -10,7 +10,6 @@ define( ['jquery'], function ( $ ) {
 			context.lineWidth = 1;
 			context.strokeStyle = 'black';
 			context.stroke();
-			
 		}
 	}
 } );
