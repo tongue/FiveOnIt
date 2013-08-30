@@ -9,7 +9,7 @@
  showReady
  startGame: noClients (antal klienter)
  clickCallback: status(true/false), x, y, nextObject
- GameOver: clients
+ GameOver: 
  */
 
 define( [
@@ -36,6 +36,7 @@ define( [
 		this.context = this.canvas.getContext( '2d' );
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
+		this.$gameOver = $( '.game-over' );
 		this.socket = IO.connect( 'http://192.168.8.126:3000' );
 		this.$readyScreen = $( '.ready-screen' );
 
@@ -45,7 +46,7 @@ define( [
 	};
 
 	Game.prototype.bind = function () {
-		this.$canvas.on( 'doubletap', $.proxy( this.onDoubleTap, this ) );
+		this.$canvas.on( 'click', $.proxy( this.onDoubleTap, this ) );
 		this.$btnConnect.on( 'click', $.proxy( this.onConnectClick, this ) );
 		this.$btnReady.on( 'click', $.proxy( this.onReady, this ) );
 
@@ -53,7 +54,7 @@ define( [
 		this.socket.on( 'showReady', $.proxy( this.showReady, this ) );
 		this.socket.on( 'startGame', $.proxy( this.start, this ) );
 		this.socket.on( 'clickCallback', $.proxy( this.onClickResult, this ) );
-		this.socket.on( 'GameOver', $.proxy( this.gameOver, this ) );
+		this.socket.on( 'gameOver', $.proxy( this.gameOver, this ) );
 	};
 
 	Game.prototype.prepareNextObject = function ( nextObject ) {
@@ -89,8 +90,8 @@ define( [
 		} );
 	};
 
-	Game.prototype.showReady = function ( ) {
-		this.$readyScreen.find('.waiting' ).addClass( this.options.hiddenClass );
+	Game.prototype.showReady = function () {
+		this.$readyScreen.find( '.waiting' ).addClass( this.options.hiddenClass );
 		this.$btnReady.removeClass( this.options.hiddenClass );
 	};
 
@@ -126,7 +127,8 @@ define( [
 	};
 
 	Game.prototype.onDoubleTap = function ( event ) {
-		this.socket.emit( 'clientClick', ImageHandler.getCoordinates( this.$canvas, event.clientX, event.clientY ) );
+		window.console.log( event );
+		this.socket.emit( 'clientClick', ImageHandler.getCoordinates( this.$canvas, event.pageX, event.pageY ) );
 	};
 
 	Game.prototype.onClickResult = function ( data ) {
@@ -134,14 +136,20 @@ define( [
 			var that = this;
 			draw.drawHit( this.context, data.x, data.y );
 			this.prepareNextObject( data.nextObject );
-			setTimeout( function() {
+			setTimeout( function () {
 				that.showNextObject();
-			}, 1000);
+			}, 1000 );
 		}
 	};
 
-	Game.prototype.gameOver = function ( data ) {
+	Game.prototype.gameOver = function ( clients ) {
+		var html = '';
+		_.each( clients, function ( client ) {
+			html += '<tr><td>' + client.nick + '</td><td>' + client.points + '</td></tr>';
+		} );
 
+		this.$gameOver.find( '.highscore' ).html( html );
+		this.switchView( this.$canvasScreen, this.$gameOver );
 	};
 
 	Game.prototype.switchView = function ( from, to, callback ) {
