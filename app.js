@@ -154,8 +154,8 @@ io.sockets.on('connection', function(socket){
 				currClient.GameRound.push({HitArea: hitCoordinates[currClient.points].HitArea});
 				callbackObject.nextObject = hitCoordinates[currClient.points].viewImage;
 			}
-			callbackObject.x = hitCoordinates[currClient.points.points-1].HitArea.x;
-			callbackObject.y = hitCoordinates[currClient.points.points-1].HitArea.y;
+			callbackObject.x = hitCoordinates[currClient.points-1].HitArea.x;
+			callbackObject.y = hitCoordinates[currClient.points-1].HitArea.y;
 		}
 		socket.emit('clickCallback', callbackObject);
 		
