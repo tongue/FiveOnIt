@@ -112,7 +112,7 @@ io.sockets.on('connection', function(socket){
 				client.GameRound[0].startTime = startTime;
 			});
 
-			timer(GAME_RUNTIME_SECONDS, endGame);
+			//timer(GAME_RUNTIME_SECONDS, endGame);
 		}
 
 	})
@@ -140,26 +140,35 @@ io.sockets.on('connection', function(socket){
 			win = (clients[clients.indexOf(socket)].points >= hitCoordinates.length);
 		}
 
-		if(!win)
+
+		var callbackObject = {x: data.x, y: data.y, status: hit};
+		if(hit)
 		{
-			var callbackObject = {x: data.x, y: data.y, status: hit};
-			if(hit)
-			{
-				currClient.GameRound.push({HitArea: hitCoordinates[clients[clients.indexOf(socket)].points].HitArea});
+			currClient.GameRound.push({HitArea: hitCoordinates[clients[clients.indexOf(socket)].points].HitArea});
 
-				callbackObject.nextObject = hitCoordinates[clients[clients.indexOf(socket)].points].viewImage;
+			callbackObject.nextObject = hitCoordinates[clients[clients.indexOf(socket)].points].viewImage;
 
-				callbackObject.x = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.x;
-				callbackObject.y = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.y;
-			}
-			socket.emit('clickCallback', callbackObject);
+			callbackObject.x = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.x;
+			callbackObject.y = hitCoordinates[clients[clients.indexOf(socket)].points-1].HitArea.y;
 		}
-		else
+		socket.emit('clickCallback', callbackObject);
+		
+		if(win)
 		{
-
 			endGame();
 		}
 	})
+
+	
+	function endGame(){
+		console.log('EndGame -> GAME_ON:', GAME_ON);
+		if(GAME_ON)
+		{
+			GAME_ON = false;
+			io.sockets.emit('gameOver', getScoarboard());
+			disconnectAll();
+		}
+	}
 
 
 
@@ -169,9 +178,10 @@ io.sockets.on('connection', function(socket){
 
 });
 
-
 	function reportPointChanges()
 	{
+		console.log('Reporting Change in scoreboard');
+		
 		io.sockets.emit('scoreChange', getScoarboard());
 	}
 
@@ -220,16 +230,6 @@ function getScoarboard()
 
 	return scoreboard;
 }
-
-function endGame(){
-	if(GAME_ON)
-	{
-		GAME_ON = false;
-		io.sockets.emit('gameOver', getScoarboard());
-		disconnectAll();
-	}
-}
-
 
 function detectHit(a, b) {
   return !(
