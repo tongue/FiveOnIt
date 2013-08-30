@@ -36,6 +36,7 @@ define( [
 		this.$canvasScreen = $( '.canvas-screen' );
 		this.context = this.canvas.getContext( '2d' );
 		this.image = null;
+		this.weaponLaunched = false;
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
 		this.$gameOver = $( '.game-over' );
@@ -159,12 +160,21 @@ define( [
 
 	Game.prototype.onGreyscaleWeaponUse = function() {
 		console.log('client sent weapon event');
+		if(that.weaponLaunched)
+			return;
+		that.weaponLaunched = true;
 		this.socket.emit('greyScaleWeaponReceive');
 	};
 
 	Game.prototype.onGreyScaleWeaponReceive = function() {
 		var that = this;
-		imageEffects.greyscale(that.image,that.context);
+		var origImageData = imageEffects.greyscale(that.image, that.context)
+		setTimeout(
+			function(){
+				that.context.putImageData(origImageData, 0, 0);
+			}
+		,3000);
+
 	};
 
 	Game.prototype.switchView = function ( from, to, callback ) {
