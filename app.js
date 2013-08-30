@@ -121,6 +121,9 @@ io.sockets.on('connection', function(socket){
 	socket.on('clientClick', function(data)
 	{
 		var currClient = clients[clients.indexOf(socket)];
+		console.log('client Click: ', currClient);
+		if(!currClient) return;
+
 		var point = currClient.points;
 
 		currClient.totalClicks += 1;
@@ -159,7 +162,7 @@ io.sockets.on('connection', function(socket){
 
 		socket.emit('clickCallback', callbackObject);
 		reportPointChanges();
-		
+
 		if(win)
 		{
 			endGame();
