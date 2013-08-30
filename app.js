@@ -178,7 +178,7 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('greyScaleWeaponReceive', function(){
 		console.log('server received weapon event');
-		io.sockets.broadcast.emit('greyScaleWeaponReceive');
+		socket.broadcast.emit('greyScaleWeaponReceive');
 	});
 
 
