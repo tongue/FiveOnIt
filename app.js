@@ -40,7 +40,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 
 var io = require('socket.io').listen(server);
 
-
+var weaponFireActive = false;
 var clients = [];
 var b = 55;
 var h = 55;
@@ -179,10 +179,17 @@ io.sockets.on('connection', function(socket){
 			disconnectAll();
 		}
 	}
+	function tryToFireWeapon(emitSignalOnFire){
+		if(!weaponFireActive){
+			weaponFireActive = true;
+			socket.broadcast.emit(emitSignalOnFire);	
+			timer(5, function(){weaponFireActive = false;})
+		}
+	}
 
 	socket.on('greyScaleWeaponReceive', function(){
 		console.log('server received weapon event');
-		io.sockets.broadcast.emit('greyScaleWeaponReceive');
+		tryToFireWeapon('greyScaleWeaponReceive');
 	});
 
 
