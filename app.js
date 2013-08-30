@@ -44,6 +44,7 @@ var io = require('socket.io').listen(server);
 var clients = [];
 var b = 55;
 var h = 55;
+var GAME_ON = false;
 var GAME_RUNTIME_SECONDS = 60*5;
 var hitCoordinates = 
 [
@@ -80,7 +81,10 @@ io.sockets.on('connection', function(socket){
 		console.log(noClients);
 		if(noClients > 1)
 		{
-			io.sockets.emit('showReady', true);
+			if(!GAME_ON)
+				io.sockets.emit('showReady', true);
+			else
+				socket.emit('error', { msg: 'Unable to connect to active game'});
 		}		
 
 	})
@@ -98,6 +102,7 @@ io.sockets.on('connection', function(socket){
 
 		if(allIsReady)
 		{
+			GAME_ON = true;
 			io.sockets.emit('startGame', { noClients: clients.length} );
 			startTime = new Date();
 			startTime.setSeconds(startTime.getSeconds() + 5);
@@ -107,7 +112,7 @@ io.sockets.on('connection', function(socket){
 				client.GameRound[0].startTime = startTime;
 			});
 
-			timer(GAME_RUNTIME_SECONDS, endGame());
+			timer(GAME_RUNTIME_SECONDS, endGame);
 		}
 
 	})
@@ -157,26 +162,19 @@ io.sockets.on('connection', function(socket){
 	})
 
 
+
 	socket.on('disconnect', function(){
 		clients.splice(clients.indexOf(socket), 1);
 	});
 
 });
 
-function detectHit(a, b) {
-  return !(
-        ((a.y + a.h) < (b.y)) ||
-        (a.y > (b.y + b.h)) ||
-        ((a.x + a.w) < b.x) ||
-        (a.x > (b.x + b.w))
-    );
-}
-function Rect(x,y,w,h){ return {
-x : x,
-y : y,
-w : w,
-h : h}
-}
+
+	function reportPointChanges()
+	{
+		io.sockets.emit('scoreChange', getScoarboard());
+	}
+
 
 function disconnectAll() {
 	var rooms = io.sockets.manager.rooms;
@@ -189,6 +187,7 @@ function disconnectAll() {
 	}
     return this;
 };
+
 function timer(timeInSeconds, endCallback){
 	var interval = setInterval(function(){
 		clearInterval(interval);
@@ -197,11 +196,11 @@ function timer(timeInSeconds, endCallback){
 
 }
 
-function endGame(){
+function getScoarboard()
+{
 	var scoreboard = [];
 	clients.forEach(function(client)
 	{
-		console.log('endgame-->: ', client.username, client.points, client.totalTime);
 		scoreboard.push({nick: client.username, points: client.points, totalTime: client.totalTime});
 	});
 	
@@ -219,12 +218,33 @@ function endGame(){
 			return 0;
 		} );
 
-	io.sockets.emit('gameOver', sortedBoard);
-	disconnectAll();
+	return scoreboard;
+}
+
+function endGame(){
+	if(GAME_ON)
+	{
+		GAME_ON = false;
+		io.sockets.emit('gameOver', getScoarboard());
+		disconnectAll();
+	}
 }
 
 
-
+function detectHit(a, b) {
+  return !(
+        ((a.y + a.h) < (b.y)) ||
+        (a.y > (b.y + b.h)) ||
+        ((a.x + a.w) < b.x) ||
+        (a.x > (b.x + b.w))
+    );
+}
+function Rect(x,y,w,h){ return {
+x : x,
+y : y,
+w : w,
+h : h}
+}
 
 
 // ropa på den här när vi vill få
