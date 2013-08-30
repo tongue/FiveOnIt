@@ -188,6 +188,7 @@ io.sockets.on('connection', function(socket){
 
 
 	socket.on('disconnect', function(){
+		console.log('CLIENT DISCONNECTED');
 		clients.splice(clients.indexOf(socket), 1);
 	});
 
@@ -202,6 +203,7 @@ io.sockets.on('connection', function(socket){
 
 
 function disconnectAll() {
+	console.log("DISCONNECT ALL")
 	var rooms = io.sockets.manager.rooms;
 	var users;
 	for(var i = 0;i<rooms.length; i++){
