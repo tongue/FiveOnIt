@@ -16,11 +16,12 @@
 define( [
 	'jquery',
 	'app/imageHandler',
+	'app/imageEffects',
 	'app/timer',
 	'app/draw',
 	'socketio',
 	'mobileevents'
-], function ( $, ImageHandler, timer, draw, IO ) {
+], function ( $, ImageHandler, imageEffects, timer, draw, IO ) {
 	var Game = function () {
 		this.options = {
 			hiddenClass: 'hidden',
@@ -35,10 +36,12 @@ define( [
 		this.$canvas = $( this.canvas );
 		this.$canvasScreen = $( '.canvas-screen' );
 		this.context = this.canvas.getContext( '2d' );
+		this.image = null;
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
 		this.$gameOver = $( '.game-over' );
 		this.socket = IO.connect( 'http://192.168.8.126:3000' );
+		this.$btnWeapon = $( '#btnWeapon' );
 		this.$readyScreen = $( '.ready-screen' );
 		this.$hud = $( '.hud' );
 
@@ -51,13 +54,14 @@ define( [
 		this.$canvas.on( 'click', $.proxy( this.onDoubleTap, this ) );
 		this.$btnConnect.on( 'click', $.proxy( this.onConnectClick, this ) );
 		this.$btnReady.on( 'click', $.proxy( this.onReady, this ) );
-
+		this.$btnWeapon.on( 'click', $.proxy( this.onGreyscaleWeaponUse, this ) );
 		this.socket.on( 'preloadGame', $.proxy( this.create, this ) );
 		this.socket.on( 'showReady', $.proxy( this.showReady, this ) );
 		this.socket.on( 'startGame', $.proxy( this.start, this ) );
 		this.socket.on( 'clickCallback', $.proxy( this.onClickResult, this ) );
 		this.socket.on( 'gameOver', $.proxy( this.gameOver, this ) );
 		this.socket.on( 'scoreChange', $.proxy( this.updateScore, this ) );
+		this.socket.on( 'greyScaleWeaponReceive', $.proxy(this.onGreyScaleWeaponReceive, this) )
 	};
 
 	Game.prototype.prepareNextObject = function ( nextObject ) {
@@ -91,6 +95,7 @@ define( [
 		this.prepareNextObject( gameData.nextObject );
 		this.image = ImageHandler.addImage( gameData.imageUrl, function ( image ) {
 			that.context.drawImage( image, 0, 0 );
+			that.image = image;
 		} );
 	};
 
@@ -165,6 +170,16 @@ define( [
 		var me = _.findWhere( clients, { nick: this.username });
 		var diff = first.points - me.points;
 		this.$hud.find( '.client-diff' ).text('(' + diff + ')');
+	};
+
+	Game.prototype.onGreyscaleWeaponUse = function() {
+		console.log('client sent weapon event');
+		this.socket.emit('greyScaleWeaponReceive');
+	};
+
+	Game.prototype.onGreyScaleWeaponReceive = function() {
+		var that = this;
+		imageEffects.greyscale(that.image,that.context);
 	};
 
 	Game.prototype.switchView = function ( from, to, callback ) {
