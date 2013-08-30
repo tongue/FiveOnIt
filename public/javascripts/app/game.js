@@ -168,8 +168,14 @@ define( [
 		this.$hud.find( '.client-points' ).text( first.points + 'p');
 
 		var me = _.findWhere( clients, { nick: this.username });
-		var diff = first.points - me.points;
-		this.$hud.find( '.client-diff' ).text('(' + diff + ')');
+		var diff;
+		if (first.nick === me.nick) {
+			diff = first.points - clients[1].points;
+			this.$hud.find( '.client-diff' ).text(' (+' + diff + ')');
+		} else {
+			diff = first.points - me.points;
+			this.$hud.find( '.client-diff' ).text(' (-' + diff + ')');
+		}
 	};
 
 	Game.prototype.onGreyscaleWeaponUse = function() {
