@@ -17,5 +17,5 @@ define( [''], function ( $ ) {
 			imageData.data.set(dataCopy);
 			return imageData;
 		}
-	}
+	};
 } );

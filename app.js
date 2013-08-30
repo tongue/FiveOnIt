@@ -185,6 +185,16 @@ io.sockets.on('connection', function(socket){
 		socket.broadcast.emit('greyScaleWeaponReceive');
 	});
 
+	socket.on('greyScaleWeaponReceive', function(){
+		console.log('server received greyscale weapon event');
+		socket.broadcast.emit('greyScaleWeaponReceive');
+	});
+
+	socket.on('exorcistWeaponReceive', function(){
+		console.log('server received exorcist event');
+		socket.broadcast.emit('exorcistWeaponReceive');
+	});
+
 
 
 	socket.on('disconnect', function(){

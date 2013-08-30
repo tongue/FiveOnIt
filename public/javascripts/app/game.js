@@ -42,6 +42,7 @@ define( [
 		this.$gameOver = $( '.game-over' );
 		this.socket = IO.connect( 'http://192.168.8.142:3000' );
 		this.$btnWeapon = $( '#btnWeapon' );
+		this.$btnWeapon2 = $( '#btnWeapon2');
 		this.$readyScreen = $( '.ready-screen' );
 		this.$hud = $( '.hud' );
 
@@ -55,6 +56,7 @@ define( [
 		this.$btnConnect.on( 'click', $.proxy( this.onConnectClick, this ) );
 		this.$btnReady.on( 'click', $.proxy( this.onReady, this ) );
 		this.$btnWeapon.on( 'click', $.proxy( this.onGreyscaleWeaponUse, this ) );
+		this.$btnWeapon2.on('click', $.proxy( this.onExorcistWeaponUse, this));
 		this.socket.on( 'preloadGame', $.proxy( this.create, this ) );
 		this.socket.on( 'showReady', $.proxy( this.showReady, this ) );
 		this.socket.on( 'startGame', $.proxy( this.start, this ) );
@@ -62,7 +64,8 @@ define( [
 
 		this.socket.on( 'gameOver', $.proxy( this.gameOver, this ) );
 		this.socket.on( 'scoreChange', $.proxy( this.updateScore, this ) );
-		this.socket.on( 'greyScaleWeaponReceive', $.proxy(this.onGreyScaleWeaponReceive, this) )
+		this.socket.on( 'greyScaleWeaponReceive', $.proxy(this.onGreyScaleWeaponReceive, this) );
+		this.socket.on( 'exorcistWeaponReceive', $.proxy(this.onExorcistWeaponReceive, this) );
 
 	};
 
@@ -181,9 +184,22 @@ define( [
 	};
 
 	Game.prototype.onGreyscaleWeaponUse = function() {
-		console.log('client sent weapon event');
+		console.log('client sent greyscale weapon event');
 		this.socket.emit('greyScaleWeaponReceive');
 	};
+
+	Game.prototype.onExorcistWeaponUse = function() {
+		console.log('client sent exorcist event');
+		this.socket.emit('exorcistWeaponReceive');
+	};
+
+	Game.prototype.onExorcistWeaponReceive = function() {
+		console.log('client received exorcist event');
+		var that = this;
+		imageEffects.exorcist(that.image, that.context);
+	};
+
+	
 
 	Game.prototype.onGreyScaleWeaponReceive = function() {
 		console.log('client received weapon event');
