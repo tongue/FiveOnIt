@@ -1,6 +1,7 @@
 extends layout
 
 block content
+
 	div.splash-screen
 		img(src="images/mag7logo.png")
 
@@ -12,7 +13,9 @@ block content
 					span.client-points
 					span.client-diff
 
-			button#weapon.weapon Fire!
+			button#btnWeapon.weapon Fire 1!
+			button#btnWeapon2.weapon Fire 2!
+
 		canvas#image-map(width='1653', height='950').hidden
 		div.next-object.hidden
 			h2 Find me!

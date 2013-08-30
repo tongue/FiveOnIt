@@ -41,7 +41,7 @@ define( [
 		this.$btnConnect = $( '#connect' );
 		this.$btnReady = $( '#ready' );
 		this.$gameOver = $( '.game-over' );
-		this.socket = IO.connect( 'http://192.168.8.126:3000' );
+		this.socket = IO.connect( 'http://192.168.8.142:3000' );
 		this.$btnWeapon = $( '#btnWeapon' );
 		this.$readyScreen = $( '.ready-screen' );
 		this.$hud = $( '.hud' );
@@ -60,9 +60,11 @@ define( [
 		this.socket.on( 'showReady', $.proxy( this.showReady, this ) );
 		this.socket.on( 'startGame', $.proxy( this.start, this ) );
 		this.socket.on( 'clickCallback', $.proxy( this.onClickResult, this ) );
+
 		this.socket.on( 'gameOver', $.proxy( this.gameOver, this ) );
 		this.socket.on( 'scoreChange', $.proxy( this.updateScore, this ) );
 		this.socket.on( 'greyScaleWeaponReceive', $.proxy(this.onGreyScaleWeaponReceive, this) )
+
 	};
 
 	Game.prototype.prepareNextObject = function ( nextObject ) {
@@ -188,6 +190,7 @@ define( [
 	};
 
 	Game.prototype.onGreyScaleWeaponReceive = function() {
+		console.log('client received weapon event');
 		var that = this;
 		imageEffects.greyscale(that.image,that.context);
 	};
