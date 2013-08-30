@@ -44,6 +44,7 @@ var io = require('socket.io').listen(server);
 var clients = [];
 var b = 55;
 var h = 55;
+var GAME_RUNTIME_SECONDS = 60*5;
 var hitCoordinates = 
 [
 	{HitArea: Rect(399,270,b,h), viewImage: '/images/pok1.png'},
@@ -51,6 +52,7 @@ var hitCoordinates =
 	{HitArea: Rect(572,759,b,h), viewImage: '/images/pok3.png'},
 	{HitArea: Rect(1425,162,b,h), viewImage: '/images/pok4.png'},
 	{HitArea: Rect(1141,811,b,h), viewImage: '/images/pok5.png'}
+	//{HitArea: Rect(0,0,b,h), viewImage: '/images/pok5.png'}
 ];
 
 io.sockets.on('connection', function(socket){
@@ -61,6 +63,8 @@ io.sockets.on('connection', function(socket){
 		clients[clients.indexOf(socket)].username = data.username;
 
 		clients[clients.indexOf(socket)].points = 0;
+
+		clients[clients.indexOf(socket)].totalTime = 0;
 
 		clients[clients.indexOf(socket)].GameRound= [];
 
@@ -73,9 +77,8 @@ io.sockets.on('connection', function(socket){
 		})
 
 		var noClients = clients.length;
-		//console.log(clients);
-		
-		if(noClients >= 2)
+		console.log(noClients);
+		if(noClients > 1)
 		{
 			io.sockets.emit('showReady', true);
 		}		
@@ -86,28 +89,28 @@ io.sockets.on('connection', function(socket){
 		
 		clients[clients.indexOf(socket)].isReady = data.ready;
 		
-		console.log('client is: ', 
-			clients[clients.indexOf(socket)].username, 'and: ', 
-			clients[clients.indexOf(socket)].isReady);
-
 		var allIsReady = true;
-		clients.forEach(function(index, client){
+		
+		clients.forEach(function(client){
 			if(allIsReady)
-				allIsReady = clients[clients.indexOf(socket)].isReady;
+				allIsReady = client.isReady;
 		});
 
 		if(allIsReady)
 		{
 			io.sockets.emit('startGame', { noClients: clients.length} );
-			clients[clients.indexOf(socket)].GameRound[0].startTime = new Date().getTime();
+			startTime = new Date();
+			startTime.setSeconds(startTime.getSeconds() + 5);
+			startTime = startTime.getTime();
+			clients.forEach(function(client)
+			{
+				client.GameRound[0].startTime = startTime;
+			});
+
+			timer(GAME_RUNTIME_SECONDS, endGame());
 		}
 
 	})
-
-	socket.on('disconnect', function(){
-		clients.splice(clients.indexOf(socket), 1);
-	});
-
 
 	socket.on('clientClick', function(data)
 	{
@@ -124,7 +127,9 @@ io.sockets.on('connection', function(socket){
 		
 		if(hit)// 55 * 55
 		{
-			currClient.GameRound[point].roundTime = new totalTimeSinceStart(currClient.GameRound[point].startTime);	
+			var roundTime = totalTimeSinceStart(currClient.GameRound[point].startTime);
+			currClient.totalTime += roundTime
+			currClient.GameRound[point].roundTime = roundTime;
 			
 			clients[clients.indexOf(socket)].points += 1;
 			win = (clients[clients.indexOf(socket)].points >= hitCoordinates.length);
@@ -135,8 +140,6 @@ io.sockets.on('connection', function(socket){
 			var callbackObject = {x: data.x, y: data.y, status: hit};
 			if(hit)
 			{
-				
-				
 				currClient.GameRound.push({HitArea: hitCoordinates[clients[clients.indexOf(socket)].points].HitArea});
 
 				callbackObject.nextObject = hitCoordinates[clients[clients.indexOf(socket)].points].viewImage;
@@ -148,10 +151,16 @@ io.sockets.on('connection', function(socket){
 		}
 		else
 		{
-			io.sockets.emit('gameOver', true);
-			disconnectAll();
+
+			endGame();
 		}
 	})
+
+
+	socket.on('disconnect', function(){
+		clients.splice(clients.indexOf(socket), 1);
+	});
+
 });
 
 function detectHit(a, b) {
@@ -189,8 +198,28 @@ function timer(timeInSeconds, endCallback){
 }
 
 function endGame(){
+	var scoreboard = [];
+	clients.forEach(function(client)
+	{
+		console.log('endgame-->: ', client.username, client.points, client.totalTime);
+		scoreboard.push({nick: client.username, points: client.points, totalTime: client.totalTime});
+	});
 	
-	io.sockets.emit("endGame",{first:"1", second:"2", third:"3"});
+	var sortedBoard = scoreboard.sort(function(a,b) 
+		{ 
+			if(a.points > b.points)
+				return -1;
+			else if(a.points < b.points)
+				return 1;
+
+			if(a.totalTime < b.totalTime)
+				return -1;
+			if(a.totalTime > b.totalTime)
+				return 1;
+			return 0;
+		} );
+
+	io.sockets.emit('gameOver', sortedBoard);
 	disconnectAll();
 }
 
